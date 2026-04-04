@@ -1,0 +1,20 @@
+# Test 1: Basic allocation and deallocation
+# Tests pool_init, pool_malloc, pool_free, pool_stats, pool_cleanup
+
+INIT
+STATS
+
+# Allocate some blocks
+MALLOC a 100
+MALLOC b 200
+MALLOC c 50
+STATS
+
+# Free all blocks
+FREE a
+FREE b
+FREE c
+STATS
+
+CLEANUP
+QUIT

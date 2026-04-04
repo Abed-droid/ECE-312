@@ -1,0 +1,49 @@
+# Test 5: Complex alloc/free interleaving
+# Tests that the allocator handles a realistic pattern of allocations and
+# frees that happen out of order, verifying correct free list management.
+
+INIT
+
+# Allocate 5 blocks of varying sizes
+MALLOC a 64
+MALLOC b 128
+MALLOC c 256
+MALLOC d 64
+MALLOC e 512
+STATS
+
+# Free in non-sequential order: c, then a, then e
+# This creates non-adjacent free blocks scattered through the pool
+FREE c
+STATS
+
+FREE a
+STATS
+
+FREE e
+STATS
+
+# Now allocate something that fits in the first free slot (where a was)
+# ALIGN(64) = 64. First-fit should find the 64-byte block left by a.
+MALLOC f 64
+STATS
+
+# Allocate something that won't fit in the 256-byte slot but will fit in the 512-byte slot
+# ALIGN(300) = 304. Should go where e was (512 bytes available, split to [304][208]).
+MALLOC g 300
+STATS
+
+# Free b — this is between f (allocated where a was) and the free gap (where c was)
+# After freeing b, coalescing should merge with the c-gap if they are adjacent
+FREE b
+STATS
+
+# Free f, d, g — everything should coalesce back
+FREE f
+FREE d
+FREE g
+STATS
+# Final state should be: free_size = 4096, free_blocks = 1, total_blocks = 1
+
+CLEANUP
+QUIT

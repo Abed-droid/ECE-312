@@ -1,0 +1,70 @@
+# Test 7: Coalescing chains of 3+ adjacent free blocks
+# Tests that coalesce_blocks correctly handles merging 3 or more
+# consecutive adjacent free blocks in a single pass (don't advance
+# the pointer after a merge).
+
+INIT
+
+# Allocate 5 contiguous blocks
+MALLOC a 100
+MALLOC b 100
+MALLOC c 100
+MALLOC d 100
+MALLOC e 100
+STATS
+
+# Free the middle three blocks (b, c, d) to create a chain of 3 adjacent frees.
+# Important: free them in order so each free triggers coalescing.
+# After FREE b: [ALLOC a][FREE b][ALLOC c][ALLOC d][ALLOC e][FREE rest]
+#   b and rest are NOT adjacent (c is between them), so no merge.
+FREE b
+STATS
+
+# After FREE c: [ALLOC a][FREE b][FREE c][ALLOC d][ALLOC e][FREE rest]
+#   b and c ARE adjacent → merge into [FREE b+c (208 bytes)]
+FREE c
+STATS
+
+# After FREE d: [ALLOC a][FREE b+c][FREE d][ALLOC e][FREE rest]
+#   b+c and d ARE adjacent → merge into [FREE b+c+d (312 bytes)]
+FREE d
+STATS
+
+# Now free a and e to coalesce everything
+FREE a
+STATS
+
+FREE e
+STATS
+# Should be: free_size = 4096, total_blocks = 1, free_blocks = 1
+
+# ============================================
+# Second test: free in REVERSE order to test different coalescing pattern
+# ============================================
+
+MALLOC x1 200
+MALLOC x2 200
+MALLOC x3 200
+MALLOC x4 200
+STATS
+
+# Free in reverse: x4, x3, x2, x1
+# x4 should coalesce with the trailing free block
+FREE x4
+STATS
+
+# x3 coalesces with the merged x4+rest block
+FREE x3
+STATS
+
+# x2 coalesces with the merged x3+x4+rest block
+FREE x2
+STATS
+
+# x1 coalesces with everything → one big block
+FREE x1
+STATS
+# Should be: free_size = 4096, total_blocks = 1
+
+CLEANUP
+QUIT

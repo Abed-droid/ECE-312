@@ -1,0 +1,34 @@
+# Test 2: Fragmentation and coalescing
+# Tests that adjacent free blocks get merged properly
+
+INIT
+
+# Create several allocations
+MALLOC a 100
+MALLOC b 100
+MALLOC c 100
+MALLOC d 100
+STATS
+
+# Free alternating blocks to create fragmentation
+FREE b
+FREE d
+STATS
+
+# Try to allocate something larger than any single free block
+# This should fail due to fragmentation
+MALLOC e 150
+STATS
+
+# Free remaining blocks
+FREE a
+FREE c
+STATS
+
+# Now coalescing should merge everything
+# and we should be able to allocate a large block
+MALLOC big 300
+STATS
+
+CLEANUP
+QUIT

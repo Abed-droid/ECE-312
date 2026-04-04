@@ -1,0 +1,27 @@
+# Test 3: Edge cases
+# Tests error handling for various edge conditions
+
+INIT
+
+# Zero-size allocation (should return NULL)
+MALLOC zero 0
+
+# Small allocation (tests alignment)
+MALLOC tiny 1
+STATS
+
+# Oversized allocation (should fail - pool is only 4096 bytes)
+MALLOC huge 5000
+STATS
+
+# Free the tiny allocation
+FREE tiny
+
+# Attempt double-free (should print error)
+FREE tiny
+
+# Attempt to free unknown ID (should print error)
+FREE nonexistent
+
+CLEANUP
+QUIT

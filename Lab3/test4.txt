@@ -1,0 +1,51 @@
+# Test 4: Block splitting and size accounting
+# Verifies that splitting produces correct block sizes and that
+# the total of all block sizes always equals POOL_SIZE (4096).
+# Headers do NOT consume pool memory — only payloads do.
+
+INIT
+STATS
+# After init: 1 free block of 4096 bytes. free_size = 4096.
+
+# Allocate 100 bytes. ALIGN(100) = 104.
+# Pool splits into: [ALLOC 104] [FREE 3992]
+# free_size = 3992, total_blocks = 2, free_blocks = 1
+MALLOC a 100
+STATS
+
+# Allocate 56 bytes. ALIGN(56) = 56 (already aligned).
+# Pool: [ALLOC 104] [ALLOC 56] [FREE 3936]
+# free_size = 3936, total_blocks = 3, free_blocks = 1
+MALLOC b 56
+STATS
+
+# Allocate exactly 8 bytes (minimum alignment).
+# Pool: [ALLOC 104] [ALLOC 56] [ALLOC 8] [FREE 3928]
+# free_size = 3928, total_blocks = 4, free_blocks = 1
+MALLOC c 8
+STATS
+
+# Free the middle block (b).
+# Pool: [ALLOC 104] [FREE 56] [ALLOC 8] [FREE 3928]
+# free_size = 3984, total_blocks = 4, free_blocks = 2
+# No coalescing possible (b is not adjacent to the big free block because c is between them).
+FREE b
+STATS
+
+# Allocate 48 bytes. ALIGN(48) = 48.
+# First-fit finds the 56-byte free block.
+# 56 - 48 = 8, and 8 >= ALIGNMENT (8), so it splits!
+# Pool: [ALLOC 104] [ALLOC 48] [FREE 8] [ALLOC 8] [FREE 3928]
+# free_size = 3936, total_blocks = 5, free_blocks = 2
+MALLOC d 48
+STATS
+
+# Free everything and verify full recovery
+FREE a
+FREE c
+FREE d
+STATS
+# After all frees + coalescing: free_size should be 4096, 1 block
+
+CLEANUP
+QUIT

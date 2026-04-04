@@ -1,0 +1,87 @@
+# Test 6: Fill the pool and recover
+# Allocates many blocks until the pool is nearly full, frees them all,
+# and verifies the pool is fully recovered and can handle a large allocation.
+
+INIT
+
+# Allocate many 100-byte blocks.
+# ALIGN(100) = 104. We'll allocate 30 blocks (30 * 104 = 3120 bytes used).
+MALLOC a1 100
+MALLOC a2 100
+MALLOC a3 100
+MALLOC a4 100
+MALLOC a5 100
+MALLOC a6 100
+MALLOC a7 100
+MALLOC a8 100
+MALLOC a9 100
+MALLOC a10 100
+MALLOC a11 100
+MALLOC a12 100
+MALLOC a13 100
+MALLOC a14 100
+MALLOC a15 100
+MALLOC a16 100
+MALLOC a17 100
+MALLOC a18 100
+MALLOC a19 100
+MALLOC a20 100
+MALLOC a21 100
+MALLOC a22 100
+MALLOC a23 100
+MALLOC a24 100
+MALLOC a25 100
+MALLOC a26 100
+MALLOC a27 100
+MALLOC a28 100
+MALLOC a29 100
+MALLOC a30 100
+STATS
+
+# Try to allocate more than what's left (976 bytes free, try 1000)
+MALLOC toobig 1000
+STATS
+
+# Free all 30 blocks
+FREE a1
+FREE a2
+FREE a3
+FREE a4
+FREE a5
+FREE a6
+FREE a7
+FREE a8
+FREE a9
+FREE a10
+FREE a11
+FREE a12
+FREE a13
+FREE a14
+FREE a15
+FREE a16
+FREE a17
+FREE a18
+FREE a19
+FREE a20
+FREE a21
+FREE a22
+FREE a23
+FREE a24
+FREE a25
+FREE a26
+FREE a27
+FREE a28
+FREE a29
+FREE a30
+STATS
+# After all frees: free_size = 4096, total_blocks = 1, free_blocks = 1
+
+# Verify we can allocate a big block now that everything is coalesced
+MALLOC big 4000
+STATS
+
+FREE big
+STATS
+
+CLEANUP
+QUIT
