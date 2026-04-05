@@ -1,8 +1,6 @@
-*.o
-*.obj
-*.elf
-*.bin
-*.out
-*.exe
-build/
-.vscode/
+*
+!*.c
+!*.h
+!Makefile
+!.gitignore
+!README.md
