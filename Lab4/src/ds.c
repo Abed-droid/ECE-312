@@ -17,21 +17,68 @@
 
 /* TODO 1 */
 Node *create_question_node(const char *question) {
-    return NULL;
+    if (question == NULL) return NULL;
+    // Create Node pointer
+    Node* question_node = (Node*) malloc(sizeof(Node));
+    if (question_node == NULL) return NULL;
+    question_node->isQuestion = 1;
+    // First allocate memory for question on heap then assign it to question_node->text
+    // same as strdup(question_node->text, question);
+    question_node->text = (char*) malloc(sizeof(char) * (strlen(question) + 1));
+    if (question_node->text == NULL){
+        free(question_node);
+        return NULL;
+    }
+    strcpy(question_node->text, question);
+    // Set child nodes to NULL at first
+    question_node->yes = NULL;
+    question_node->no = NULL;
+
+    return question_node;
 }
 
 /* TODO 2 */
 Node *create_solution_node(const char *solution) {
-    return NULL;
+    if (solution == NULL) return NULL;
+    Node* solution_node = (Node*) malloc(sizeof(Node));
+    if (solution_node == NULL) return NULL;
+    solution_node->isQuestion = 0;
+    solution_node->text = (char *) malloc(sizeof(char) * (strlen(solution) + 1));
+    if (solution_node->text == NULL){
+        free(solution_node);
+        return NULL;
+    }
+    strcpy(solution_node->text, solution);
+    solution_node->no = NULL;
+    solution_node->yes = NULL;
+
+    return solution_node;
 }
 
 /* TODO 3  (recursion allowed) */
 void free_tree(Node *node) {
+    // For a given node we must first free its leftmost leaf
+    // Then we free its rightmost leaft
+
+    // Recusrive:
+    // Base cases:
+    if (node == NULL){
+        return;
+    }
+    free_tree(node->no);
+    free_tree(node->yes);
+    free_tree(node);
+
 }
 
 /* TODO 4  (recursion allowed) */
 int count_nodes(Node *root) {
-    return 0;
+    // Base cases (leaf nodes)
+    if (root == NULL) return 0;
+    // Base case (node)
+    else {
+        return 1 + count_nodes(root->no) + count_nodes(root->yes);
+    }
 }
 
 
@@ -39,25 +86,55 @@ int count_nodes(Node *root) {
 
 /* TODO 5 */
 void fs_init(FrameStack *s) {
+    if (s== NULL) return;
+    s->capacity = 0;
+    s->size = 0;
+    s->frames = NULL;
+
 }
 
 /* TODO 6 */
 void fs_push(FrameStack *s, Node *node, int answeredYes) {
+    if (s== NULL || node == NULL || (answeredYes != 0 && answeredYes != -1 && answeredYes != 1)) return;
+    if (s->capacity == s->size){
+        if (s->capacity == 0) s->capacity = 2;
+        else s->capacity = s->capacity * 2;
+        // Dynamically grow Frames array
+        s->frames = realloc(s->frames,sizeof(Frame) * s->capacity);
+        if (s->frames == NULL) return;
+    }
+    s->frames[s->size].node = node;
+    s->frames[s->size].answeredYes = answeredYes;
+    s->size = s->size + 1;
+
+    // When you push to a stack, you first insert then increament/decreament 
+    // ex: push: [Frame0] -> [Frame0, Frame1]
+    // pop: Frame1
 }
 
 /* TODO 7 */
 Frame fs_pop(FrameStack *s) {
     Frame dummy = {NULL, -1};
-    return dummy;
+    if (s == NULL || s->size == 0) return dummy;
+    Frame frame = s->frames[s->size - 1];
+    s->size = s->size - 1;
+    return frame;
 }
 
 /* TODO 8 */
 int fs_empty(FrameStack *s) {
-    return 1;
+    if (s == NULL || s->size == 0) return 1;
+    return 0;
+
 }
 
 /* TODO 9 */
 void fs_free(FrameStack *s) {
+    if (s == NULL) return;
+    free(s->frames);
+    s->frames = NULL;
+    s->size = 0;
+    s->capacity = 0;
 }
 
 
