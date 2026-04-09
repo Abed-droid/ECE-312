@@ -316,8 +316,10 @@ int h_put(Hash *h, const char *key, int solutionId) {
     int bucketIndex = hashValue % h->nbuckets;
     Entry *current = h->buckets[bucketIndex];
     while (current != NULL) {
+        // If the key already exists, we need to check if the solutionId is already in the vals list
         if (strcmp(current->key, canonicalKey) == 0) {
-            // Key already exists, add solutionId to vals if not already present
+
+            // Key already exists return
             for (int i = 0; i < current->vals.count; i++) {
                 if (current->vals.ids[i] == solutionId) {
                     free(canonicalKey);
@@ -330,12 +332,14 @@ int h_put(Hash *h, const char *key, int solutionId) {
                 current->vals.ids = realloc(current->vals.ids, sizeof(int) * current->vals.capacity);
                 if (current->vals.ids == NULL) return 0;
             }
+            // add solutionId to vals if not already present
             current->vals.ids[current->vals.count] = solutionId;
             current->vals.count++;
             
             free(canonicalKey);
             return 1;
         }
+        // Move to the next entry in the bucket's linked list
         current = current->next;
     }
 
@@ -355,10 +359,10 @@ int h_put(Hash *h, const char *key, int solutionId) {
         return 0;
     }
     
-    newEntry->vals.ids[0] = solutionId;
-    newEntry->vals.count = 1;
-    newEntry->next = h->buckets[bucketIndex];
-    h->buckets[bucketIndex] = newEntry;
+    newEntry->vals.ids[0] = solutionId;  // Add the solutionId to the new entry
+    newEntry->vals.count = 1; // Set the count to 1 since we added one solutionId
+    newEntry->next = h->buckets[bucketIndex]; // Insert the new entry at the beginning of the bucket's linked list
+    h->buckets[bucketIndex] = newEntry; // Update the bucket to point to the new entry
     h->size++;
 
     return 1;
@@ -374,7 +378,8 @@ int h_contains(const Hash *h, const char *key, int solutionId) {
     int bucketIndex = hashValue % h->nbuckets;
     Entry *current = h->buckets[bucketIndex];
     while (current != NULL) {
-        if (strcmp(current->key, canonicalKey) == 0) {
+        if (strcmp(current->key, canonicalKey) == 0) // the keys are the same
+        {
             for (int i = 0; i < current->vals.count; i++) {
                 if (current->vals.ids[i] == solutionId) {
                     free(canonicalKey);
