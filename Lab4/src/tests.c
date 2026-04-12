@@ -187,6 +187,7 @@ void test_integrity(void) {
     root->no = NULL;
     assert(!check_integrity());
 
+    free(root->no);
     root->no = create_solution_node("S2");
     root->yes->yes = create_solution_node("ghost");
     assert(!check_integrity());

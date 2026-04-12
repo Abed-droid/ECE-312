@@ -15,6 +15,41 @@ extern Node *g_root;
  * Return 1 if valid, 0 if any violation is found.
  * ---------------------------------------------------------------- */
 int check_integrity(void) {
+    if (g_root == NULL) return 0;
+
+
+    // BFS
+    Queue q;
+    q_init(&q);
+    q_enqueue(&q,g_root, 0);
+    
+    int next_id = 1;
+    int index = 0;
+    while(!q_empty(&q)){
+
+        Node *CurrentNode = NULL;
+        int id;
+        q_dequeue(&q, &CurrentNode,&id);
+        index++;
+
+        if(CurrentNode->isQuestion == 1 && (CurrentNode->yes == NULL || CurrentNode->no == NULL)){
+            q_free(&q);
+            return 0;
+        }
+        else if(CurrentNode->isQuestion == 0 && (CurrentNode->yes != NULL || CurrentNode->no != NULL)){
+            q_free(&q);
+            return 0;
+        }
+        if (CurrentNode->yes != NULL){
+            q_enqueue(&q,CurrentNode->yes,next_id);
+            next_id++;
+        }
+        if (CurrentNode->no != NULL){
+            q_enqueue(&q,CurrentNode->no,next_id);
+            next_id++;
+        }
+    }
+    q_free(&q);
     return 1;
 }
 
