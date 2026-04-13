@@ -132,6 +132,7 @@ void test_hash(void) {
     int *ids = h_get_ids(&h, "no_wifi", &cnt);
     assert(cnt == 2);
     assert((ids[0]==1 && ids[1]==3) || (ids[0]==3 && ids[1]==1));
+    free(ids);
 
     ids = h_get_ids(&h, "missing", &cnt);
     assert(ids == NULL && cnt == 0);
@@ -184,6 +185,7 @@ void test_integrity(void) {
     Node *saved = g_root; g_root = root;
     assert(check_integrity());
 
+    free_tree(root->no);
     root->no = NULL;
     assert(!check_integrity());
 

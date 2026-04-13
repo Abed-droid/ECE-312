@@ -43,20 +43,23 @@ int save_tree(const char *filename) {
     }
     // BFS traversal to fill the nodes array
     Queue* q = malloc(sizeof(Queue));
+    if (q == NULL) {
+        free(nodes);
+        fclose(file);
+        return 0;
+    }
     q_init(q);
     q_enqueue(q,g_root,0); // q [0, , , , ....]
 
     
     // nodes = [NodeMapping0,]
-    int index = 0;
     int next_id = 1;
     while(!q_empty(q)){
         Node *CurrentNode;
         int id;
         q_dequeue(q,&CurrentNode, &id); // CurrentNode -> N1
-        nodes[index].node = CurrentNode; // CurrentNode 
-        nodes[index].id = id;
-        index++;
+        nodes[id].node = CurrentNode; // CurrentNode 
+        nodes[id].id = id;
         // nodes = [NodeMapping0,]
         if (CurrentNode->yes != NULL){
             q_enqueue(q,CurrentNode->yes, next_id); // q [1,...]
@@ -123,9 +126,9 @@ int load_tree(const char *filename) {
     if (filename == NULL) return 0;
     FILE *file = fopen(filename, "rb");
     if (file == NULL) return 0;
-    uint32_t magic = NULL;
-    uint32_t version = NULL;
-    uint32_t nodeCount = NULL;
+    uint32_t magic = 0;
+    uint32_t version = 0;
+    uint32_t nodeCount = 0;
     fread(&magic, sizeof(uint32_t), 1, file);
     fread(&version, sizeof(uint32_t), 1, file);
     fread(&nodeCount, sizeof(uint32_t), 1, file);
@@ -139,9 +142,11 @@ int load_tree(const char *filename) {
         return 0;
     }
     // We first allocated memory for all Nodes
-    for (int i = 0; i < nodeCount; i++) {
+    for (uint32_t i = 0; i < nodeCount; i++) {
         nodes[i] = malloc(sizeof(Node));
         if (nodes[i] == NULL){
+            for (uint32_t j = 0; j < i; j++) free(nodes[j]);
+            free(nodes);
             fclose(file);
             return 0;
         }
@@ -150,7 +155,7 @@ int load_tree(const char *filename) {
     }
     
     // We then iterate throught each node and read from stream
-    for (int i  = 0 ; i < nodeCount; i++){
+    for (uint32_t i  = 0 ; i < nodeCount; i++){
         uint8_t isQuestion;
         uint32_t textLen;
 
@@ -160,6 +165,9 @@ int load_tree(const char *filename) {
         fread(&textLen, sizeof(uint32_t), 1, file);
         nodes[i]->text = malloc(sizeof(char) * (textLen + 1));
         if (nodes[i]->text == NULL) {
+            for (uint32_t j = 0; j < i; j++) free(nodes[j]->text);
+            for (uint32_t j = 0; j <= i; j++) free(nodes[j]);
+            free(nodes);
             fclose(file);
             return 0;
         }
