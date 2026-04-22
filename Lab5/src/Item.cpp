@@ -26,8 +26,9 @@ Item::~Item() {
 // Hint: use getName(), getDescription(), getValue()
 //
 void Item::displayInfo() const {
-    // TODO: print item info (3 lines of std::cout)
-    std::cout << getName();
+    std::cout << "[ITEM] " << getName() << std::endl;
+    std::cout << "  " << getDescription() << std::endl;
+    std::cout << "  Value: " << getValue() << std::endl;
 }
 
 
@@ -37,7 +38,7 @@ void Item::displayInfo() const {
 //
 void Item::displayBrief() const {
     // TODO: print brief info
-    // hint: std::cout << getName() << " (" << getType() << ")" << std::endl;
+    cout << getName() << " (" << getType() << ")" << endl;
 }
 
 
@@ -61,7 +62,7 @@ void Weapon::displayInfo() const {
     std::cout << "[WEAPON] " << getName() << std::endl;
     std::cout << "  " << getDescription() << std::endl;
     // TODO: print damage bonus line
-    // hint: std::cout << "  Damage Bonus: +" << getDamageBonus() << std::endl;
+    std::cout << "  Damage Bonus: +" << getDamageBonus() << std::endl;
 }
 
 
@@ -85,6 +86,7 @@ void Armor::displayInfo() const {
     std::cout << "[ARMOR] " << getName() << std::endl;
     std::cout << "  " << getDescription() << std::endl;
     // TODO: print defense bonus line
+    std::cout << "  Defense Bonus: +" << getDefenseBonus() << std::endl;
 }
 
 
@@ -110,6 +112,7 @@ void Consumable::displayInfo() const {
     std::cout << "[CONSUMABLE] " << getName() << std::endl;
     std::cout << "  " << getDescription() << std::endl;
     // TODO: print healing amount line
+    std::cout << "  Restores: " << getHealingAmount() << " HP" << std::endl;
 }
 
 
@@ -122,6 +125,8 @@ void Consumable::displayInfo() const {
 void Consumable::use() {
     if (!used) {
         // TODO: print message and set used = true
+        cout << "Used " << getName() <<"! Restored " << getHealingAmount() << " HP." << endl;
+        used = true;
     } else {
         std::cout << getName() << " has already been used!" << std::endl;
     }

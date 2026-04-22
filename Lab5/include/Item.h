@@ -3,6 +3,8 @@
 
 #include <string>
 #include <iostream>
+using std::cout;
+using std::endl;
 
 /**
  * Item class - Base class for all items in the game
