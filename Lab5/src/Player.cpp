@@ -33,7 +33,10 @@ Player::Player(const std::string& name)
 //     inventory.clear();
 //
 Player::~Player() {
-    // TODO: delete all inventory items
+    for (int i = 0; i < (int)inventory.size(); i++) {
+        delete inventory[i];
+    }
+    inventory.clear();
 }
 
 
@@ -85,8 +88,9 @@ void Player::displayStats() const {
 //     return dmg;
 //
 int Player::calculateDamage() const {
-    // TODO: calculate damage with weapon bonus
-    return 0;  // REPLACE THIS
+    int dmg = Character::calculateDamage();
+    if (equipped_weapon) dmg += equipped_weapon->getValue();
+    return dmg;
 }
 
 
@@ -111,8 +115,8 @@ void Player::removeItem(const std::string& item_name) {
     std::string target = toLower(item_name);
     for (int i = 0; i < (int)inventory.size(); i++) {
         if (toLower(inventory[i]->getName()) == target) {
-            // TODO: if this item is the equipped weapon or armor,
-            //       set the pointer to NULL first!
+            if (inventory[i] == equipped_weapon) equipped_weapon = NULL;
+            if (inventory[i] == equipped_armor)  equipped_armor  = NULL;
             delete inventory[i];
             inventory.erase(inventory.begin() + i);
             return;
@@ -186,10 +190,8 @@ void Player::equipWeapon(const std::string& weapon_name) {
         std::cout << "That's not a weapon!" << std::endl;
         return;
     }
-    // TODO: set equipped_weapon and print message
-    // hint:
-    //   equipped_weapon = item;
-    //   std::cout << "Equipped " << weapon_name << "!" << std::endl;
+    equipped_weapon = item;
+    std::cout << "Equipped " << weapon_name << "!" << std::endl;
 }
 
 
@@ -205,7 +207,8 @@ void Player::equipArmor(const std::string& armor_name) {
         std::cout << "That's not armor!" << std::endl;
         return;
     }
-    // TODO: set equipped_armor and print message
+    equipped_armor = item;
+    std::cout << "Equipped " << armor_name << "!" << std::endl;
 }
 
 
@@ -251,12 +254,10 @@ void Player::useItem(const std::string& item_name) {
         return;
     }
 
-    // TODO: cast to Consumable*, heal, mark used, then remove from inventory
-    // hint:
-    //   Consumable* c = static_cast<Consumable*>(item);
-    //   heal(c->getHealingAmount());
-    //   c->use();
-    //   removeItem(item_name);
+    Consumable* c = static_cast<Consumable*>(item);
+    heal(c->getHealingAmount());
+    c->use();
+    removeItem(item_name);
 }
 
 
@@ -267,7 +268,9 @@ void Player::gainExperience(int exp) {
     experience += exp;
     std::cout << "Gained " << exp << " experience!" << std::endl;
 
-    // TODO: if experience >= level * 100, call levelUp()
+    if (experience >= level * 100) {
+        levelUp();
+    }
 }
 
 
@@ -281,15 +284,13 @@ void Player::gainExperience(int exp) {
 //   defense += 1     (use setDefense(getDefense() + 1))
 //
 void Player::levelUp() {
-    // TODO: level up the player and print a message
-    // hint:
-    //   level++;
-    //   experience = 0;
-    //   setMaxHP(getMaxHP() + 10);
-    //   setCurrentHP(getMaxHP());
-    //   setAttack(getAttack() + 2);
-    //   setDefense(getDefense() + 1);
-    //   std::cout << "\n*** LEVEL UP! ***" << std::endl;
-    //   std::cout << "You are now level " << level << "!" << std::endl;
-    //   displayStats();
+    level++;
+    experience = 0;
+    setMaxHP(getMaxHP() + 10);
+    setCurrentHP(getMaxHP());
+    setAttack(getAttack() + 2);
+    setDefense(getDefense() + 1);
+    std::cout << "\n*** LEVEL UP! ***" << std::endl;
+    std::cout << "You are now level " << level << "!" << std::endl;
+    displayStats();
 }

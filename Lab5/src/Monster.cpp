@@ -24,7 +24,10 @@ Monster::Monster(const std::string& name, int hp, int attack, int defense,
 //     loot_table.clear();
 //
 Monster::~Monster() {
-    // TODO: delete all items in loot_table and clear the vector
+    for (int i = 0; i < (int)loot_table.size(); i++) {
+        delete loot_table[i];
+    }
+    loot_table.clear();
 }
 
 
@@ -33,8 +36,7 @@ Monster::~Monster() {
 // Use getName(), getCurrentHP(), getMaxHP()
 //
 void Monster::displayStats() const {
-    // TODO: print monster stats
-    // hint: std::cout << getName() << " [HP: " << getCurrentHP() << "/" << getMaxHP() << "]" << std::endl;
+    std::cout << getName() << " [HP: " << getCurrentHP() << "/" << getMaxHP() << "]" << std::endl;
 }
 
 
@@ -54,8 +56,7 @@ void Monster::addLoot(Item* item) {
 //
 std::vector<Item*> Monster::dropLoot() {
     std::vector<Item*> dropped = loot_table;
-    // TODO: clear loot_table so the monster no longer owns the items
-    // hint: loot_table.clear();
+    loot_table.clear();
     return dropped;
 }
 
@@ -64,8 +65,7 @@ std::vector<Item*> Monster::dropLoot() {
 // Return: "MonsterName attacks!"
 //
 std::string Monster::getAttackMessage() const {
-    // TODO: return getName() + " attacks!"
-    return "";  // REPLACE THIS
+    return getName() + " attacks!";
 }
 
 
@@ -74,17 +74,16 @@ std::string Monster::getAttackMessage() const {
 // ============================================================================
 
 // Constructor — PROVIDED (stats set, but you need to add loot)
-Goblin::Goblin() 
+Goblin::Goblin()
     : Monster("Goblin", 30, 5, 2, 10, 5) {
-    // TODO 5: Add a small potion to loot table
-    // hint: addLoot(new Consumable("Small Potion", "Restores 10 HP", 10));
+    addLoot(new Consumable("Small Potion", "Restores 10 HP", 10));
 }
 
 // TODO 6: Override getAttackMessage for Goblin
 // Return: "The goblin swipes at you with its rusty dagger!"
 //
 std::string Goblin::getAttackMessage() const {
-    return "";  // REPLACE THIS
+    return "The goblin swipes at you with its rusty dagger!";
 }
 
 
@@ -95,15 +94,14 @@ std::string Goblin::getAttackMessage() const {
 // Constructor — PROVIDED (stats set, but you need to add loot)
 Skeleton::Skeleton()
     : Monster("Skeleton", 40, 8, 4, 20, 10) {
-    // TODO 7: Add an old sword to loot table
-    // hint: addLoot(new Weapon("Old Sword", "A battered but usable blade", 3));
+    addLoot(new Weapon("Old Sword", "A battered but usable blade", 3));
 }
 
 // TODO 8: Override getAttackMessage for Skeleton
 // Return: "The skeleton rattles its bones and slashes with a sword!"
 //
 std::string Skeleton::getAttackMessage() const {
-    return "";  // REPLACE THIS
+    return "The skeleton rattles its bones and slashes with a sword!";
 }
 
 
@@ -114,17 +112,16 @@ std::string Skeleton::getAttackMessage() const {
 // Constructor — PROVIDED (stats set, but you need to add legendary loot)
 Dragon::Dragon()
     : Monster("Dragon", 150, 20, 10, 100, 50) {
-    // TODO 9: Add legendary loot:
-    //   addLoot(new Weapon("Dragon Slayer", "A legendary blade", 10));
-    //   addLoot(new Armor("Dragon Scale Armor", "Incredibly tough scales", 8));
-    //   addLoot(new Consumable("Greater Health Potion", "Restores 100 HP", 100));
+    addLoot(new Weapon("Dragon Slayer", "A legendary blade", 10));
+    addLoot(new Armor("Dragon Scale Armor", "Incredibly tough scales", 8));
+    addLoot(new Consumable("Greater Health Potion", "Restores 100 HP", 100));
 }
 
 // TODO 10: Override getAttackMessage for Dragon
 // Return: "The dragon breathes fire at you!"
 //
 std::string Dragon::getAttackMessage() const {
-    return "";  // REPLACE THIS
+    return "The dragon breathes fire at you!";
 }
 
 // TODO 11: Override calculateDamage for Dragon
@@ -134,5 +131,5 @@ std::string Dragon::getAttackMessage() const {
 //     return Monster::calculateDamage() + 5;
 //
 int Dragon::calculateDamage() const {
-    return 0;  // REPLACE THIS
+    return Monster::calculateDamage() + 5;
 }

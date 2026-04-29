@@ -74,8 +74,7 @@ void Character::heal(int amount) {
 // Format: "Name [HP: current/max]"
 //
 void Character::displayStats() const {
-    // TODO: print name and HP
-    std::cout << "Name [HP: current/max]" << std::endl;
+    std::cout << name << " [HP: " << current_hp << "/" << max_hp << "]" << std::endl;
 }
 
 
@@ -83,6 +82,5 @@ void Character::displayStats() const {
 // Same format as displayStats but without a newline at the end.
 //
 void Character::displayStatus() const {
-    // TODO: print brief status (use std::cout without std::endl)
-    std::cout << "Name [HP: current/max]";
+    std::cout << name << " [HP: " << current_hp << "/" << max_hp << "]";
 }

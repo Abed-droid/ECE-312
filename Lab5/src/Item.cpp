@@ -7,7 +7,8 @@ using std::string;
 // Constructor — PROVIDED (no changes needed)
 Item::Item(const std::string& name, const std::string& description,
            const std::string& type, int value)
-    : name(name), description(description), type(type), value(value) {
+    :name(name), description(description), type(type), value(value)
+{
 }
 
 // Destructor — PROVIDED (nothing to clean up)

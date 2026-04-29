@@ -33,7 +33,7 @@ public:
     // Destructor - CRITICAL for memory management!
     // TODO: Implement in Monster.cpp
     // HINT: Must delete all items in loot_table
-    ~Monster();
+    virtual ~Monster();
     
     // Override displayStats from Character
     // TODO: Implement in Monster.cpp

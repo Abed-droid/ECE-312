@@ -2,7 +2,8 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
-
+using std::string;
+using std::map;
 // Constructor — PROVIDED
 Game::Game() : player(NULL), current_room(NULL), 
                game_over(false), victory(false) {
@@ -24,7 +25,13 @@ Game::Game() : player(NULL), current_room(NULL),
 //   world.clear();
 //
 Game::~Game() {
+
     // TODO: clean up player and all rooms
+    if (player != NULL) delete player;
+    for (map<string, Room*>::iterator it = world.begin(); it != world.end(); it++) {
+        delete it->second;
+    }
+    world.clear();
 }
 
 
@@ -101,6 +108,7 @@ void Game::createStartingInventory() {
 //
 void Game::addRoom(Room* room) {
     // TODO: add room to world map
+    if (room != NULL) { world[room->getName()] = room; }
 }
 
 
@@ -129,6 +137,7 @@ void Game::connectRooms(const std::string& room1_name, const std::string& direct
 
         // TODO: add the reverse exit
         // hint: room2->addExit(reverse, room1);
+        room2->addExit(reverse, room1);
     }
 }
 
@@ -167,24 +176,22 @@ void Game::run() {
     current_room->display();
     current_room->markVisited();
 
-    // TODO: main game loop
-    // hint:
-    //   while (!game_over) {
-    //       std::cout << "\n> ";
-    //       std::string command;
-    //       std::getline(std::cin, command);
-    //       std::transform(command.begin(), command.end(), command.begin(), ::tolower);
-    //       if (!command.empty()) processCommand(command);
-    //
-    //       if (victory) {
-    //           std::cout << "\nVICTORY! You have defeated the dragon!" << std::endl;
-    //           game_over = true;
-    //       }
-    //       if (!player->isAlive()) {
-    //           std::cout << "\nYou have died... Game Over." << std::endl;
-    //           game_over = true;
-    //       }
-    //   }
+    while (!game_over) {
+        std::cout << "\n> ";
+        std::string command;
+        std::getline(std::cin, command);
+        std::transform(command.begin(), command.end(), command.begin(), ::tolower);
+        if (!command.empty()) processCommand(command);
+
+        if (victory) {
+            std::cout << "\nVICTORY! You have defeated the dragon!" << std::endl;
+            game_over = true;
+        }
+        if (!player->isAlive()) {
+            std::cout << "\nYou have died... Game Over." << std::endl;
+            game_over = true;
+        }
+    }
 }
 
 
@@ -269,16 +276,13 @@ void Game::move(const std::string& direction) {
     }
 
     Room* next = current_room->getExit(direction);
-    // TODO: if next is not NULL, move there; otherwise print error
-    // hint:
-    //   if (next != NULL) {
-    //       current_room = next;
-    //       current_room->display();
-    //       current_room->markVisited();
-    //   } else {
-    //       std::cout << "You can't go that way!" << std::endl;
-    //   }
-    (void)next;  // suppress warning until you implement the TODO above
+    if (next != NULL) {
+        current_room = next;
+        current_room->display();
+        current_room->markVisited();
+    } else {
+        std::cout << "You can't go that way!" << std::endl;
+    }
 }
 
 
@@ -341,8 +345,7 @@ void Game::combat(Monster* monster) {
                     current_room->addItem(loot[i]);
                 }
 
-                // TODO: check if this was the Dragon — if so, set victory = true
-                // hint: if (monster->getName() == "Dragon") victory = true;
+                if (monster->getName() == "Dragon") victory = true;
 
                 current_room->clearMonster();
                 break;
@@ -379,15 +382,12 @@ void Game::combat(Monster* monster) {
 //
 void Game::pickupItem(const std::string& item_name) {
     Item* item = current_room->getItem(item_name);
-    // TODO: if item exists, add to player and remove from room
-    // hint:
-    //   if (item != NULL) {
-    //       player->addItem(item);
-    //       current_room->removeItem(item_name);
-    //   } else {
-    //       std::cout << "Item not found: " << item_name << std::endl;
-    //   }
-    (void)item;  // suppress warning until you implement the TODO above
+    if (item != NULL) {
+        player->addItem(item);
+        current_room->removeItem(item_name);
+    } else {
+        std::cout << "Item not found: " << item_name << std::endl;
+    }
 }
 
 
@@ -414,7 +414,13 @@ void Game::equip(const std::string& item_name) {
         std::cout << "You don't have that item!" << std::endl;
         return;
     }
-    // TODO: check type and call appropriate equip method
+    if (item->getType() == "Weapon") {
+        player->equipWeapon(item_name);
+    } else if (item->getType() == "Armor") {
+        player->equipArmor(item_name);
+    } else {
+        std::cout << "You can't equip that!" << std::endl;
+    }
 }
 
 

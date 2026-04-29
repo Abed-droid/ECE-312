@@ -35,7 +35,7 @@ public:
     
     // Destructor
     // TODO: Implement in Character.cpp (add debug output if helpful)
-    ~Character();
+    virtual ~Character();
     
     // Getters (inline functions - defined in header)
     // These are simple one-liners, so we define them here

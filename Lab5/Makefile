@@ -41,6 +41,7 @@ all: $(EXECUTABLE)
 # Link object files into executable
 $(EXECUTABLE): $(OBJECTS)
 	@echo "Linking..."
+	@mkdir -p $(OUT_DIR)
 	$(CXX) -o $(OUT_DIR)/$@ $^
 	@echo "Build complete! Run with: ./$(OUT_DIR)/$(EXECUTABLE)"
 
